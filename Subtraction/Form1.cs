@@ -11,47 +11,15 @@ using System.Windows.Forms.DataVisualization.Charting;
 
 namespace Subtraction
 {
-    public partial class DIP : Form
+    public partial class Form1 : Form
     {
         Bitmap imageB, imageA, colorgreen, resultImage;
         Bitmap loadImg, processedImage;
         int a, r, g, b, tr, tg, tb;
-        
-
-        private void loadImage_Click(object sender, EventArgs e)
-        {
-            openFileDialog1.Filter = "Image Files|*.jpg;*.jpeg;*.png;*.gif;*.bmp|All Files|*.*";
-
-            if (openFileDialog1.ShowDialog() == DialogResult.OK) { }
-        }
-
-        private void loadbackground_Click(object sender, EventArgs e)
-        {
-            openFileDialog2.Filter = "Image Files|*.jpg;*.jpeg;*.png;*.gif;*.bmp|All Files|*.*";
-
-            if (openFileDialog2.ShowDialog() == DialogResult.OK) { }
-        }
-
-        private void openFileDialog2_FileOk(object sender, CancelEventArgs e)
-        {
-            imageA = new Bitmap(openFileDialog2.FileName);
-            pictureBox2.Image = new Bitmap(imageA);
-        }
-
-        private void Form1_Load(object sender, EventArgs e)
-        {
-
-        }
-
-        private void openToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            openFileDialog1.Filter = "Image Files|*.jpg;*.jpeg;*.png;*.gif;*.bmp|All Files|*.*";
-
-            if (openFileDialog1.ShowDialog() == DialogResult.OK) { }
-        }
 
         private void histogramToolStripMenuItem_Click(object sender, EventArgs e)
         {
+
             int[] redH = new int[256];
             int[] greenH = new int[256];
             int[] blueH = new int[256];
@@ -103,94 +71,69 @@ namespace Subtraction
 
         }
 
-        private void chart2_Click(object sender, EventArgs e)
+        private void loadImage_Click(object sender, EventArgs e)
         {
+            openFileDialog1.Filter = "Image Files|*.jpg;*.jpeg;*.png;*.gif;*.bmp|All Files|*.*";
 
+            if (openFileDialog1.ShowDialog() == DialogResult.OK) { }
         }
 
-        private void saveToolStripMenuItem_Click(object sender, EventArgs e)
+        private void loadbackground_Click(object sender, EventArgs e)
         {
-            SaveFileDialog sf = new SaveFileDialog();
-            sf.Filter = "Image Files|*.jpg;*.jpeg;*.png;";
+            openFileDialog2.Filter = "Image Files|*.jpg;*.jpeg;*.png;*.gif;*.bmp|All Files|*.*";
 
-            if (sf.ShowDialog() == DialogResult.OK)
-            {
-                pictureBox2.Image.Save(sf.FileName);
-            }
+            if (openFileDialog2.ShowDialog() == DialogResult.OK) { }
         }
 
-        private void greyscaleToolStripMenuItem_Click(object sender, EventArgs e)
+        private void subtract_Click(object sender, EventArgs e)
         {
-            loadImg = new Bitmap(openFileDialog1.FileName);
-            Color pixel;
-            int gray;
-            processedImage = new Bitmap(loadImg.Width, loadImg.Height);
+            Color mygreen = Color.FromArgb(0, 0, 255);
+            int greygreen = (mygreen.R + mygreen.G + mygreen.B) / 3;
+            int threshold = 5;
+            resultImage = new Bitmap(imageA.Width, imageA.Height);
 
-            for (int x = 0; x < loadImg.Width; x++)
+
+            for (int x = 0; x < imageB.Width; x++)
             {
-                for (int y = 0; y < loadImg.Height; y++)
+                for (int y = 0; y < imageB.Height; y++)
                 {
-                    pixel = loadImg.GetPixel(x, y);
-                    gray = (byte)((pixel.R + pixel.G + pixel.B) / 3);
-                    processedImage.SetPixel(x, y, Color.FromArgb(gray, gray, gray));
+                    Color pixel = imageB.GetPixel(x, y);
+                    Color backpixel = imageA.GetPixel(x, y);
 
+                    int grey = (pixel.R + pixel.G + pixel.B) / 3;
+                    int subtractvalue = Math.Abs(grey - greygreen);
+
+                    if (subtractvalue < threshold)
+                    {
+                        resultImage.SetPixel(x, y, backpixel);
+
+                        Console.WriteLine($"Position ({x}, {y}):");
+                        Console.WriteLine($"  ImageA: {backpixel}");
+                        Console.WriteLine($"  ImageB: {pixel}");
+                        Console.WriteLine($"  SubtractValue: {subtractvalue}");
+
+                    }
+                    else
+                        resultImage.SetPixel(x, y, pixel);
                 }
+
             }
-            pictureBox2.Image = processedImage;
+
+            pictureBox3.Image = resultImage;
+        
+    }
+
+        private void openFileDialog1_FileOk(object sender, CancelEventArgs e)
+        {
+
+            imageB = new Bitmap(openFileDialog1.FileName);
+            pictureBox1.Image = new Bitmap(imageB);
         }
 
-        private void invertToolStripMenuItem_Click(object sender, EventArgs e)
+        private void openFileDialog2_FileOk(object sender, CancelEventArgs e)
         {
-            loadImg = new Bitmap(openFileDialog1.FileName);
-            Color pixel;
-            //int gray;
-            processedImage = new Bitmap(loadImg.Width, loadImg.Height);
-
-            for (int x = 0; x < loadImg.Width; x++)
-            {
-                for (int y = 0; y < loadImg.Height; y++)
-                {
-                    pixel = loadImg.GetPixel(x, y);
-                    processedImage.SetPixel(x, y, Color.FromArgb(255 - pixel.R, 255 - pixel.G, 255 - pixel.B));
-                }
-            }
-            pictureBox2.Image = processedImage;
-        }
-
-        private void xToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            loadImg = new Bitmap(openFileDialog1.FileName);
-            Color pixel;
-            //int gray;
-            processedImage = new Bitmap(loadImg.Width, loadImg.Height);
-
-            for (int x = 0; x < loadImg.Width; x++)
-            {
-                for (int y = 0; y < loadImg.Height; y++)
-                {
-                    pixel = loadImg.GetPixel(x, y);
-                    processedImage.SetPixel((loadImg.Width - 1) - x, y, pixel);
-                }
-            }
-            pictureBox2.Image = processedImage;
-        }
-
-        private void yToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            loadImg = new Bitmap(openFileDialog1.FileName);
-            Color pixel;
-            //int gray;
-            processedImage = new Bitmap(loadImg.Width, loadImg.Height);
-
-            for (int x = 0; x < loadImg.Width; x++)
-            {
-                for (int y = 0; y < loadImg.Height; y++)
-                {
-                    pixel = loadImg.GetPixel(x, y);
-                    processedImage.SetPixel(x, (loadImg.Height - 1) - y, pixel);
-                }
-            }
-            pictureBox2.Image = processedImage;
+            imageA = new Bitmap(openFileDialog2.FileName);
+            pictureBox2.Image = new Bitmap(imageA);
         }
 
         private void sepiaToolStripMenuItem_Click(object sender, EventArgs e)
@@ -225,61 +168,112 @@ namespace Subtraction
             pictureBox2.Image = processedImage;
         }
 
+        private void yToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            loadImg = new Bitmap(openFileDialog1.FileName);
+            Color pixel;
+            //int gray;
+            processedImage = new Bitmap(loadImg.Width, loadImg.Height);
+
+            for (int x = 0; x < loadImg.Width; x++)
+            {
+                for (int y = 0; y < loadImg.Height; y++)
+                {
+                    pixel = loadImg.GetPixel(x, y);
+                    processedImage.SetPixel(x, (loadImg.Height - 1) - y, pixel);
+                }
+            }
+            pictureBox2.Image = processedImage;
+        }
+
+        private void xToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            loadImg = new Bitmap(openFileDialog1.FileName);
+            Color pixel;
+            //int gray;
+            processedImage = new Bitmap(loadImg.Width, loadImg.Height);
+
+            for (int x = 0; x < loadImg.Width; x++)
+            {
+                for (int y = 0; y < loadImg.Height; y++)
+                {
+                    pixel = loadImg.GetPixel(x, y);
+                    processedImage.SetPixel((loadImg.Width - 1) - x, y, pixel);
+                }
+            }
+            pictureBox2.Image = processedImage;
+        }
+
+        private void invertToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            loadImg = new Bitmap(openFileDialog1.FileName);
+            Color pixel;
+            //int gray;
+            processedImage = new Bitmap(loadImg.Width, loadImg.Height);
+
+            for (int x = 0; x < loadImg.Width; x++)
+            {
+                for (int y = 0; y < loadImg.Height; y++)
+                {
+                    pixel = loadImg.GetPixel(x, y);
+                    processedImage.SetPixel(x, y, Color.FromArgb(255 - pixel.R, 255 - pixel.G, 255 - pixel.B));
+                }
+            }
+            pictureBox2.Image = processedImage;
+        }
+
+        private void greyscaleToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            loadImg = new Bitmap(openFileDialog1.FileName);
+            Color pixel;
+            int gray;
+            processedImage = new Bitmap(loadImg.Width, loadImg.Height);
+
+            for (int x = 0; x < loadImg.Width; x++)
+            {
+                for (int y = 0; y < loadImg.Height; y++)
+                {
+                    pixel = loadImg.GetPixel(x, y);
+                    gray = (byte)((pixel.R + pixel.G + pixel.B) / 3);
+                    processedImage.SetPixel(x, y, Color.FromArgb(gray, gray, gray));
+
+                }
+            }
+            pictureBox2.Image = processedImage;
+        }
+
+        public Form1()
+        {
+            InitializeComponent();
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void openToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            openFileDialog1.Filter = "Image Files|*.jpg;*.jpeg;*.png;*.gif;*.bmp|All Files|*.*";
+
+            if (openFileDialog1.ShowDialog() == DialogResult.OK) { }
+        }
+
+        private void saveToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SaveFileDialog sf = new SaveFileDialog();
+            sf.Filter = "Image Files|*.jpg;*.jpeg;*.png;";
+
+            if (sf.ShowDialog() == DialogResult.OK)
+            {
+                pictureBox2.Image.Save(sf.FileName);
+            }
+        }
+
         private void copyToolStripMenuItem_Click(object sender, EventArgs e)
         {
             loadImg = new Bitmap(openFileDialog1.FileName);
             pictureBox2.Image = loadImg;
         }
-
-        private void openFileDialog1_FileOk(object sender, CancelEventArgs e)
-        {
-            imageB = new Bitmap(openFileDialog1.FileName);
-            pictureBox1.Image = new Bitmap(imageB);
-        }
-
-        private void subtract_Click(object sender, EventArgs e)
-        {
-            Color mygreen = Color.FromArgb(0, 0, 255);
-            int greygreen = (mygreen.R + mygreen.G + mygreen.B) / 3;
-            int threshold = 5;
-            resultImage = new Bitmap(imageA.Width, imageA.Height);
-
-            
-            for (int x = 0; x < imageB.Width; x++)
-            {
-                for (int y = 0; y < imageB.Height; y++)
-                {
-                    Color pixel = imageB.GetPixel(x, y);
-                    Color backpixel = imageA.GetPixel(x, y);
-
-                    int grey = (pixel.R + pixel.G + pixel.B) / 3;
-                    int subtractvalue = Math.Abs(grey - greygreen);
-
-                    if (subtractvalue < threshold)
-                    {
-                        resultImage.SetPixel(x, y, backpixel);
-
-                        Console.WriteLine($"Position ({x}, {y}):");
-                        Console.WriteLine($"  ImageA: {backpixel}");
-                        Console.WriteLine($"  ImageB: {pixel}");
-                        Console.WriteLine($"  SubtractValue: {subtractvalue}");
-
-                    }  else
-                        resultImage.SetPixel(x, y, pixel);
-                }
-                
-            }
-
-            pictureBox3.Image = resultImage;
-        }
-
-        
-
-        public DIP()
-        {
-            InitializeComponent();
-        }
-
-       
     }
 }

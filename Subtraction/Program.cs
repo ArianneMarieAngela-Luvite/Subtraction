@@ -16,7 +16,7 @@ namespace Subtraction
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new DIP());
+            Application.Run(new Form1());
         }
     }
 }
