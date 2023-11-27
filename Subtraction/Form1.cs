@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
+using WebCamLib;
 
 namespace Subtraction
 {
@@ -16,6 +17,7 @@ namespace Subtraction
         Bitmap imageB, imageA, colorgreen, resultImage;
         Bitmap loadImg, processedImage;
         int a, r, g, b, tr, tg, tb;
+        Device[] cam = DeviceManager.GetAllDevices();
 
         private void histogramToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -134,6 +136,22 @@ namespace Subtraction
         {
             imageA = new Bitmap(openFileDialog2.FileName);
             pictureBox2.Image = new Bitmap(imageA);
+        }
+
+        private void openDeviceToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (cam.Length > 0)
+            {
+                Device c = DeviceManager.GetDevice(0);
+                c.ShowWindow(pictureBox1);
+            }
+
+        }
+
+        private void closeDeviceToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Device c = DeviceManager.GetDevice(0);
+            c.Stop();
         }
 
         private void sepiaToolStripMenuItem_Click(object sender, EventArgs e)
